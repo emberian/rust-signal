@@ -3,10 +3,10 @@ use std::libc::*;
 static SA_MASK_SIZE: c_int = 16;
 
 struct sigaction_t {
-    handler: extern "C" fn(c_int, *c_void, *c_void),
+    handler: *u8, // XXX: this is an extern fn
     sa_mask: [c_ulong, ..16],
     sa_flags: c_int,
-    sa_restorer: extern "C" fn()
+    sa_restorer: *u8 // XXX: this is an extern fn
 }
 
 static SIG_ERR: c_int = -1;
@@ -20,9 +20,9 @@ extern "C" {
 }
 
 extern "C" fn handle(number: c_int, info: *c_void, userdata: *c_void) {
-    let s = "Got SIGINT!".to_c_str();
+    let s = "Got SIGINT!";
     unsafe {
-        s.with_ref(|x| puts(x));
+        s.as_c_str(|x| puts(x));
     }
 }
 
